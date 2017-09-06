@@ -19,6 +19,7 @@ body {
     height: 65px;
     margin-top: 5px;
     margin-bottom: 5px;
+    white-space: nowrap;
 }
 
 /*.board .board-score .item {*/
@@ -56,4 +57,10 @@ body {
 .score-img {
     width:  30px;
     height: 48px;
+}
+
+.board-court {
+    position: absolute;
+    left: 0;
+    bottom: 0;
 }

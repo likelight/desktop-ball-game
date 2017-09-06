@@ -23,4 +23,6 @@
         //
     };
 
+    window.Score = Score;
+
 })();
