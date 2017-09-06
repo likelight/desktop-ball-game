@@ -10,26 +10,41 @@ body {
 }
 
 .board {
-    position: relative;
 }
 
-.board .score {
-    width: 525px;
-    height: 137px;
-    position: absolute;
-    top: 4px;
-    left: 50%;
-    transform: translateX(-50%) scale(.4);
-    background: url(../images/scoreboard.png) no-repeat center center;
+.board-score {
+    text-align: center;
+    width: 45%;
+    margin:  0 auto;
+    height: 60px;
+    margin-top: 5px;
+}
+
+/*.board .board-score .item {*/
+    /*width: 525px;*/
+    /*height: 137px;*/
+    /*position: absolute;*/
+    /*top: 4px;*/
+    /*left: 50%;*/
+    /*transform: translateX(-50%) scale(.4);*/
+    /*background: url(../images/scoreboard-background.png) no-repeat center center;*/
+    /*background-size: cover;*/
+/*}*/
+
+.board .board-score .item {
+    display: inline-block;
+    width: 36px;
+    height: 54px;
+    margin-right: 5px;
+    background: url(../images/scoreboard-background.png) no-repeat center center;
     background-size: cover;
 }
 
-.board .score .item {
-    float: left;
-    color: #fff;
-    width: 40px;
-    height: 60px;
-    text-align: center;
-    line-height: 60px;
-    font-size: 30px;
+.board .board-score .score-seprator {
+    display: inline-block;
+    width: 15px;
+    height: 54px;
+    margin-right: 10px;
+    background: url(../images/scoreboard_seprator.png) no-repeat center center;
+    background-size: cover;
 }
