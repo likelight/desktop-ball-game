@@ -15,20 +15,37 @@
         }
     }
 
+    function setLeftScore(score) {
+        var tenScore = 0;
+        var singleScore = 0;
+        singleScore = score % 10;
+        tenScore = parseInt(score / 10);
+        var url1 = './images/' + tenScore + '.png';
+        var url2 = './images/' + singleScore + '.png';
+
+        document.getElementById('scoreleft-ten').setAttribute('src', url1);
+        document.getElementById('scoreleft-single').setAttribute('src', url2);
+    }
+
+    function setRightScore(score) {
+        var tenScore = 0;
+        var singleScore = 0;
+        singleScore = score % 10;
+        tenScore = parseInt(score / 10);
+        var url1 = './images/' + tenScore + '.png';
+        var url2 = './images/' + singleScore + '.png';
+
+        document.getElementById('scoreright-ten').setAttribute('src', url1);
+        document.getElementById('scoreright-single').setAttribute('src', url2);
+
+    }
+
     var canvas = document.getElementById('match');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight - 70;
 
     var gameManager = {
         manifest: [
-            {
-                src: '0.png',
-                id: 'num0'
-            },
-            {
-                src: '1.png',
-                id: 'num1'
-            },
             {
                 src: 'scoreboard-background.png',
                 id: 'bg'
@@ -42,6 +59,9 @@
             }, {
                 src: 'court.png',
                 id: 'court'
+            }, {
+                src: 'dice.png',
+                id: 'ball'
             }
         ],
         init: function () {
@@ -63,22 +83,74 @@
             var bg1 = new createjs.Bitmap(bgResult);
             bg1.x = bg1.y = 0;
             bg1.scaleX = canvas.width / bg1.getBounds().width;
-            bg1.scaleY = canvas.height/ (bg1.getBounds().height);
-
+            bg1.scaleY = canvas.height / (bg1.getBounds().height);
             bgContainer.addChild(bg1);
-            this.stage.addChild(bgContainer);
 
+            var buttonContainer = new createjs.Container();
+
+            var buttonImg = this.loader.getResult('button');
+            var leftButton = new createjs.Bitmap(buttonImg);
+            var rightButton = new createjs.Bitmap(buttonImg);
+            leftButton.x = 10;
+            leftButton.y = 170;
+
+            rightButton.x = 850;
+            rightButton.y = 170;
+            rightButton.scaleX = leftButton.scaleX = canvas.width / bg1.getBounds().width;
+            rightButton.scaleY = leftButton.scaleY = canvas.height / (bg1.getBounds().height);
+
+            //this.stage.addChild(Rect);//添加子视图
+            leftButton.addEventListener("mousedown", function (e) {
+                var shape = e.target;
+                shape.on('pressmove', function (t) {
+                    shape.x = t.stageX;
+                    shape.y = t.stageY;
+                    this.stage.update();
+                }.bind(this));
+
+                shape.on("pressup", function(evt) {
+                     shape.removeAllEventListeners();
+                }.bind(this));
+
+            }.bind(this));
+
+            rightButton.addEventListener("mousedown", function (e) {
+                var shape = e.target;
+                shape.on('pressmove', function (t) {
+                    shape.x = t.stageX;
+                    shape.y = t.stageY;
+                    this.stage.update();
+                }.bind(this));
+
+                shape.on("pressup", function(evt) {
+                    shape.removeAllEventListeners();
+                }.bind(this));
+
+            }.bind(this));
+
+            buttonContainer.addChild(leftButton);
+            buttonContainer.addChild(rightButton);
+
+            this.stage.addChild(bgContainer);
+            this.stage.addChild(buttonContainer);
             this.stage.update();
+        },
+        startMove: function (e) {
+            var shape = e.target;
+            this.stage.addEventListener('stagemousemove', function (t) {
+                console.log(t);
+                shape.x = t.stageX;
+                shape.y = t.stageY;
+            });
 
         },
         startGame: function () {
 
         },
         stopGame: function () {
-            
+
         }
     };
-
 
 
     window.gameManager = gameManager;

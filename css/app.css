@@ -16,8 +16,9 @@ body {
     text-align: center;
     width: 45%;
     margin:  0 auto;
-    height: 60px;
+    height: 65px;
     margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 /*.board .board-score .item {*/
@@ -32,6 +33,7 @@ body {
 /*}*/
 
 .board .board-score .item {
+    vertical-align: middle;
     display: inline-block;
     width: 36px;
     height: 54px;
@@ -41,10 +43,17 @@ body {
 }
 
 .board .board-score .score-seprator {
+    vertical-align: middle;
+    padding-top: 5px;
     display: inline-block;
     width: 15px;
     height: 54px;
     margin-right: 10px;
     background: url(../images/scoreboard_seprator.png) no-repeat center center;
     background-size: cover;
+}
+
+.score-img {
+    width:  30px;
+    height: 48px;
 }
