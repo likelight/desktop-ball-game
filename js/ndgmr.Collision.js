@@ -154,6 +154,12 @@ this.ndgmr = this.ndgmr || {};
     } else {
       ctx.drawImage(image,0,0,image.width,image.height);
     }
+    if (intersetion.width < 1) {
+      intersetion.width = 1;
+    }
+    if (intersetion.height < 1) {
+      intersetion.height = 1;
+    }
     return ctx.getImageData(0, 0, intersetion.width, intersetion.height).data;
   }
 
