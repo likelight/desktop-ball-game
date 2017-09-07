@@ -37,7 +37,6 @@
 
         document.getElementById('scoreright-ten').setAttribute('src', url1);
         document.getElementById('scoreright-single').setAttribute('src', url2);
-
     }
 
     var canvas = document.getElementById('match');
@@ -73,7 +72,44 @@
             this.loader.addEventListener('complete', this.handleLoadComplete.bind(this));
             this.loader.loadManifest(this.manifest, true, './images/');
         },
+        initScore: function () {
+            this.leftScore = 0;
+            this.rightScore = 0;
+            setLeftScore(this.leftScore);
+            setRightScore(this.rightScore);
+        },
         tick: function (e) {
+            // 判断是否进球
+            var result = this.checkIsGetScore();
+            if (result) {
+                // 左边被进球, 右边得分
+                if (result === 1) {
+                    this.rightScore ++;
+                    if (this.rightScore <= 99) {
+                        setRightScore(this.rightScore);
+                    } else {
+                        this.rightScore = 0;
+                        setRightScore(this.rightScore);
+                    }
+                } else if ( result === 2) {
+                    // 右边被进球,左边得分
+                    this.leftScore ++;
+                    if (this.leftScore <= 99) {
+                        setLeftScore(this.leftScore);
+                    } else {
+                        this.leftScore = 0;
+                        setLeftScore(this.leftScore);
+                    }
+                }
+
+                this.removeEvent();
+                this.initStart();
+                this.initEvent();
+                this.stage.update();
+                return;
+            }
+
+            // 判断是否与button相撞
             var leftIntersection = ndgmr.checkPixelCollision(this.ball, this.leftButton, 0);
             var rightIntersection = ndgmr.checkPixelCollision(this.ball, this.rightButton, 0);
 
@@ -82,21 +118,21 @@
                 var yDistance = this.lastLeftButtonStyle.y - this.leftButtonShape.y;
                 var angle = Math.atan(yDistance/xDistance);
                 var ballStyle = this.ball.getTransformedBounds();
-
                 this.ball.isMoving = true;
             }
 
+            // 球继续运动
             if (this.ball.isMoving) {
-                this.ball.x += 1 * directionX;
-                this.ball.y += 1 * directionY;
+                this.ball.x += 6 * directionX;
+                this.ball.y += 6 * directionY;
 
                 if (this.ball.x < 0) {
                     directionX = 1;
                 }
-                if (this.ball.x > clientRect.width - this.ball.width) {
+                if (this.ball.x > clientRect.width - this.ball.width / 2) {
                     directionX = -1;
                 }
-                if (this.ball.y > clientRect.height - this.ball.height) {
+                if (this.ball.y > clientRect.height - this.ball.height / 2) {
                     directionY = -1;
                 }
                 if (this.ball.y < 0) {
@@ -105,56 +141,26 @@
 
                 this.stage.update();
             }
+
         },
-        handleLoadComplete: function () {
-            this.stage = new createjs.Stage(canvas);
-            createjs.Touch.enable(this.stage);
-            createjs.Ticker.setFPS(80);
-            createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-            createjs.Ticker.addEventListener("tick", this.tick.bind(this));
-
-            var bgContainer = new createjs.Container();
-            var bgResult = this.loader.getResult('court');
-            var bg1 = new createjs.Bitmap(bgResult);
-            bg1.x = bg1.y = 0;
-            bg1.scaleX = canvas.width / bg1.getBounds().width;
-            bg1.scaleY = canvas.height / (bg1.getBounds().height);
-            bgContainer.addChild(bg1);
-
-            var buttonContainer = new createjs.Container();
-
-            var buttonImg = this.loader.getResult('button');
-            this.leftButton = new createjs.Bitmap(buttonImg);
-            this.rightButton = new createjs.Bitmap(buttonImg);
-
-            this.rightButton.scaleX = this.leftButton.scaleX = canvas.width / bg1.getBounds().width;
-            this.rightButton.scaleY = this.leftButton.scaleY = canvas.height / bg1.getBounds().height;
-
+        initStart: function () {
             this.leftButton.x = 0.1 * clientRect.width;
             this.leftButton.y = 0.5 * clientRect.height - this.leftButton.getBounds().height * 0.5;
-
             this.rightButton.x = 0.8 * clientRect.width;
             this.rightButton.y = 0.5 * clientRect.height - this.rightButton.getBounds().height * 0.5;
-
-            var ballImg = this.loader.getResult('ball');
-            this.ball = new createjs.Bitmap(ballImg);
-            // 随机出现
-            // ball.x = Math.random() * 0.5 * clientRect.width + 0.3 * clientRect.width;
-            // ball.y = Math.random() * 0.5 * clientRect.height + 0.3 * clientRect.height;
-            this.ball.x = 200;
-            this.ball.y = 150;
+            this.ball.x = 0.5 * clientRect.width - 0.5 * this.ball.width;
+            this.ball.y = 0.5 * clientRect.height - 0.5 * this.ball.height;
             this.ball.isMoving = false;
             this.ball.vx = 0;
             this.ball.vy = 0;
-            this.ball.scaleX = canvas.width / bg1.getBounds().width;
-            this.ball.scaleY = canvas.height / bg1.getBounds().height;
-            this.ball.width = this.ball.getBounds().width;
-            this.ball.height = this.ball.getBounds().height;
-
-            this.lastLeftButtonStyle = this.leftButton.getTransformedBounds();
-            this.lastRightButtonStyle = this.rightButton.getTransformedBounds();
-
-            //this.stage.addChild(Rect);//添加子视图
+            directionX = 1;
+            directionY = 1;
+        },
+        removeEvent: function () {
+            this.leftButton.removeAllEventListeners();
+            this.rightButton.removeAllEventListeners();
+        },
+        initEvent: function () {
             this.leftButton.addEventListener("mousedown", function (e) {
                 this.lastLeftButtonStyle = this.leftButton.getTransformedBounds();
                 var initLeftButtonStyle = this.leftButton.getTransformedBounds();
@@ -189,7 +195,7 @@
                 }.bind(this));
 
                 shape.on("pressup", function(evt) {
-                     this.lastLeftButtonStyle = shape.getTransformedBounds();
+                    this.lastLeftButtonStyle = shape.getTransformedBounds();
                 }.bind(this));
 
             }.bind(this));
@@ -231,6 +237,60 @@
                 }.bind(this));
 
             }.bind(this));
+        },
+        handleLoadComplete: function () {
+            this.stage = new createjs.Stage(canvas);
+            createjs.Touch.enable(this.stage);
+            createjs.Ticker.setFPS(80);
+            createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+            createjs.Ticker.addEventListener("tick", this.tick.bind(this));
+
+            var bgContainer = new createjs.Container();
+            var bgResult = this.loader.getResult('court');
+            var bg1 = new createjs.Bitmap(bgResult);
+            bg1.x = bg1.y = 0;
+            bg1.scaleX = canvas.width / bg1.getBounds().width;
+            bg1.scaleY = canvas.height / (bg1.getBounds().height);
+            bgContainer.addChild(bg1);
+
+            var buttonContainer = new createjs.Container();
+
+            var buttonImg = this.loader.getResult('button');
+            this.leftButton = new createjs.Bitmap(buttonImg);
+            this.rightButton = new createjs.Bitmap(buttonImg);
+
+            this.rightButton.scaleX = this.leftButton.scaleX = canvas.width / bg1.getBounds().width;
+            this.rightButton.scaleY = this.leftButton.scaleY = canvas.height / bg1.getBounds().height;
+            //
+            // this.leftButton.x = 0.1 * clientRect.width;
+            // this.leftButton.y = 0.5 * clientRect.height - this.leftButton.getBounds().height * 0.5;
+            //
+            // this.rightButton.x = 0.8 * clientRect.width;
+            // this.rightButton.y = 0.5 * clientRect.height - this.rightButton.getBounds().height * 0.5;
+
+            var ballImg = this.loader.getResult('ball');
+            this.ball = new createjs.Bitmap(ballImg);
+            // 随机出现
+            // ball.x = Math.random() * 0.5 * clientRect.width + 0.3 * clientRect.width;
+            // ball.y = Math.random() * 0.5 * clientRect.height + 0.3 * clientRect.height;
+            // this.ball.x = 200;
+            // this.ball.y = 150;
+            // this.ball.isMoving = false;
+            // this.ball.vx = 0;
+            // this.ball.vy = 0;
+            this.ball.scaleX = canvas.width / bg1.getBounds().width;
+            this.ball.scaleY = canvas.height / bg1.getBounds().height;
+            this.ball.width = this.ball.getBounds().width;
+            this.ball.height = this.ball.getBounds().height;
+            this.initScore();
+            this.initStart();
+
+
+            this.lastLeftButtonStyle = this.leftButton.getTransformedBounds();
+            this.lastRightButtonStyle = this.rightButton.getTransformedBounds();
+
+            //this.stage.addChild(Rect);//添加子视图
+            this.initEvent();
 
             buttonContainer.addChild(this.ball);
             buttonContainer.addChild(this.rightButton);
@@ -254,6 +314,27 @@
         },
 
         stopGame: function () {
+        },
+        checkIsGetScore: function () {
+            var height = clientRect.height;
+            var width = clientRect.width;
+            var TopLimit = height * 0.3567;
+            var BottomLimit = height * 0.63;
+            var leftLimit = width * 0.048;
+            var rightLimit = width * 0.92;
+            if (this.ball.x <= leftLimit) {
+                if (this.ball.y >= TopLimit && this.ball.y <= BottomLimit) {
+                    // 左边被进球
+                    return 1;
+                }
+            }
+
+            if (this.ball.x >= rightLimit) {
+                if (this.ball.y >= TopLimit && this.ball.y <= BottomLimit) {
+                    return 2;
+                }
+            }
+            return 0;
         }
     };
 
