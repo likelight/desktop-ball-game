@@ -91,7 +91,7 @@
     var clientRect = canvas.getBoundingClientRect();
     var directionX = 1;
     var directionY = 1;
-    var kn = 0.4;
+    var kn = 0.7;
     var fps = 80;
     var gameManager = {
         manifest: [
@@ -201,10 +201,31 @@
             }
 
             if (this.ball.vx > 0) {
-                this.ball.vx -= kn / fps;
+                if (this.ball.vx < kn/ fps) {
+                    this.ball.vx = 0;
+                } else {
+                    this.ball.vx -= kn / fps;
+                }
+            } else if (this.ball.vx < 0) {
+                if (this.ball.vx > - kn / fps) {
+                    this.ball.vx = 0;
+                } else {
+                    this.ball.vx += kn / fps;
+                }
             }
+
             if (this.ball.vy > 0) {
-                this.ball.vy -= kn / fps;
+                if (this.ball.vy < kn/ fps) {
+                    this.ball.vy = 0;
+                } else {
+                    this.ball.vy -= kn / fps;
+                }
+            } else if (this.ball.vy < 0) {
+                if (this.ball.vy > - kn / fps) {
+                    this.ball.vy = 0;
+                } else {
+                    this.ball.vy += kn / fps;
+                }
             }
             // 球继续运动
             if (this.ball.isMoving) {
