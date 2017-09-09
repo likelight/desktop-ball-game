@@ -44,6 +44,7 @@
         vy = -py * 4;
         var afterBallVx = 0;
         var afterBallVy = 0;
+
         if (vx === 0) {
             afterBallVx = - ballVx * 80;
         } else {
@@ -67,6 +68,7 @@
         vy = -py * 4;
         var afterBallVx = 0;
         var afterBallVy = 0;
+
         if (vx === 0) {
             afterBallVx = - ballVx * 80;
         } else {
@@ -182,11 +184,8 @@
                 var yDistance = this.leftButtonPosition[0].y - this.leftButtonPosition[this.leftButtonPosition.length - 1].y;
                 var vBall = makeleftBallStatus(xDistance, yDistance, this.ball.vx, this.ball.vy);
 
-
-
                 this.ball.vx = vBall.vx / 80;
                 this.ball.vy = vBall.vy / 80;
-                // var ballStyle = this.ball.getTransformedBounds();
                 this.ball.isMoving = true;
             }
 
@@ -227,22 +226,43 @@
                     this.ball.vy += kn / fps;
                 }
             }
+
             // 球继续运动
             if (this.ball.isMoving) {
-                this.ball.x += this.ball.vx * directionX;
-                this.ball.y += this.ball.vy * directionY;
+                this.ball.x += this.ball.vx * directionX / 2;
+                this.ball.y += this.ball.vy * directionY / 2;
 
-                if (this.ball.x < 0) {
-                    directionX = -directionX;
+                if (this.ball.x < 20) {
+                    if (Math.abs(directionX * 0.8) > 10) {
+                        directionX = -directionX * 0.8;
+                    }
+                    else {
+                        directionX = -directionX;
+                    }
                 }
-                if (this.ball.x > clientRect.width - this.ball.width / 2) {
-                    directionX = -directionX;
+                if (this.ball.x > clientRect.width - this.ball.width - 15) {
+                    if (Math.abs(directionX * 0.8) > 10) {
+                        directionX = -directionX * 0.8;
+                    }
+                    else {
+                        directionX = -directionX;
+                    }
                 }
-                if (this.ball.y > clientRect.height - this.ball.height / 2) {
-                    directionY = -directionY;
+                if (this.ball.y > clientRect.height - this.ball.height - 12) {
+                    if (Math.abs(directionY * 0.8) > 10) {
+                        directionY = -directionY * 0.8;
+                    }
+                    else {
+                        directionY = -directionY;
+                    }
                 }
-                if (this.ball.y < 0) {
-                    directionY = -directionY;
+                if (this.ball.y < 12) {
+                    if (Math.abs(directionY * 0.8) > 10) {
+                        directionY = -directionY * 0.8;
+                    }
+                    else {
+                        directionY = -directionY;
+                    }
                 }
 
                 this.stage.update();
@@ -324,7 +344,7 @@
                 }.bind(this));
 
                 shape.on("pressup", function(evt) {
-                    this.lastLeftButtonStyle = shape.getTransformedBounds();
+                    // this.lastLeftButtonStyle = shape.getTransformedBounds();
                 }.bind(this));
 
             }.bind(this));
@@ -362,7 +382,7 @@
                 }.bind(this));
 
                 shape.on("pressup", function(evt) {
-                    shape.removeAllEventListeners();
+                    // shape.removeAllEventListeners();
                 }.bind(this));
 
             }.bind(this));
