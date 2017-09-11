@@ -45,15 +45,6 @@
         vy = -py * 4;
         var afterBallVx = 0;
         var afterBallVy = 0;
-        if (directionX < 0) {
-            ballVx = -ballVx;
-            directionX = - directionX;
-        }
-        if (directionY < 0) {
-            ballVy = -ballVy;
-            directionY = -directionY;
-        }
-        console.log(ballVx+ ':' + ballVy);
 
         if (vx === 0) {
             afterBallVx = -ballVx * 80;
@@ -84,12 +75,12 @@
         vy = -py * 4;
         var afterBallVx = 0;
         var afterBallVy = 0;
-        if (directionX < 0) {
-            ballVx = -ballVx;
-        }
-        if (directionY < 0) {
-            ballVy = -ballVy;
-        }
+        // if (directionX < 0) {
+        //     ballVx = -ballVx;
+        // }
+        // if (directionY < 0) {
+        //     ballVy = -ballVy;
+        // }
 
         if (vx === 0) {
             afterBallVx = -ballVx * 80;
@@ -214,20 +205,15 @@
                 var yDistance = this.leftButtonPosition[0].y - this.leftButtonPosition[this.leftButtonPosition.length - 1].y;
                 var vBall = makeleftBallStatus(xDistance, yDistance, this.ball.vx, this.ball.vy);
                 this.collisionFlag = 'left';
-                console.log('left');
                 this.ball.vx = vBall.vx / 80;
                 this.ball.vy = vBall.vy / 80;
                 this.ball.isMoving = true;
                 this.count = 0;
                 directionY = directionX = 1;
 
-            } else if (leftIntersection) {
-                console.log('vx:' + this.ball.vx + 'vy:' + this.ball.vy);
-                console.log('collision:' + this.collisionFlag);
             }
 
             if (rightIntersection && this.collisionFlag !== 'right') {
-                console.log('right');
                 var xDistance1 = this.rightButtonPosition[0].x - this.rightButtonPosition[this.rightButtonPosition.length - 1].x;
                 var yDistance1 = this.rightButtonPosition[0].y - this.rightButtonPosition[this.rightButtonPosition.length - 1].y;
                 var vBall = makeRightBallStatus(xDistance1, yDistance1, this.ball.vx, this.ball.vy);
@@ -240,10 +226,6 @@
                 directionY = directionX = 1;
 
 
-
-            } else if (rightIntersection) {
-                console.log('vx:' + this.ball.vx + 'vy:' + this.ball.vy);
-                console.log(this.collisionFlag);
 
             }
 
@@ -279,15 +261,16 @@
 
             // 球继续运动
             if (this.ball.isMoving) {
-                this.ball.x += this.ball.vx * directionX / 2;
-                this.ball.y += this.ball.vy * directionY / 2;
+                this.ball.x += this.ball.vx * 1 / 2;
+                this.ball.y += this.ball.vy * 1 / 2;
 
                 if (this.ball.x < 20) {
                     if (Math.abs(directionX * 0.8) > 10) {
                         directionX = -directionX * 0.8;
                     }
                     else {
-                        directionX = -directionX;
+                        this.ball.vx = -this.ball.vx;
+                        // directionX = -directionX;
                     }
                 }
                 if (this.ball.x > clientRect.width - this.ball.width - 15) {
@@ -295,7 +278,9 @@
                         directionX = -directionX * 0.8;
                     }
                     else {
-                        directionX = -directionX;
+                        // directionX = -directionX;
+                        this.ball.vx = -this.ball.vx;
+
                     }
                 }
                 if (this.ball.y > clientRect.height - this.ball.height - 12) {
@@ -303,7 +288,8 @@
                         directionY = -directionY * 0.8;
                     }
                     else {
-                        directionY = -directionY;
+                       // directionY = -directionY;
+                        this.ball.vy = -this.ball.vy;
                     }
                 }
                 if (this.ball.y < 12) {
@@ -311,7 +297,9 @@
                         directionY = -directionY * 0.8;
                     }
                     else {
-                        directionY = -directionY;
+                        // directionY = -directionY;
+                        this.ball.vy = -this.ball.vy;
+
                     }
                 }
 
