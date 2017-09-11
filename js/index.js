@@ -15,6 +15,7 @@
         }
     }
 
+
     function setLeftScore(score) {
         var tenScore = 0;
         var singleScore = 0;
@@ -44,18 +45,32 @@
         vy = -py * 4;
         var afterBallVx = 0;
         var afterBallVy = 0;
+        if (directionX < 0) {
+            ballVx = -ballVx;
+            directionX = - directionX;
+        }
+        if (directionY < 0) {
+            ballVy = -ballVy;
+            directionY = -directionY;
+        }
+        console.log(ballVx+ ':' + ballVy);
 
         if (vx === 0) {
-            afterBallVx = - ballVx * 80;
+            afterBallVx = -ballVx * 80;
         } else {
-            afterBallVx = -ballVx * 80 + vx * 2;
+            if (vx > 0  && ballVx > 0) {
+                afterBallVx = ballVx * 80 + vx * 2.5;
+            } else {
+                afterBallVx = -ballVx * 80 + vx * 2.5;
+            }
         }
 
         if (vy === 0) {
             afterBallVy = -ballVy * 80;
         } else {
-            afterBallVy = ballVy * 80 + vy * 2;
+            afterBallVy = ballVy * 80 + vy * 2.5;
         }
+
 
         return {
             vx: afterBallVx, vy: afterBallVy
@@ -64,21 +79,32 @@
     }
 
     function makeRightBallStatus(px, py, ballVx, ballVy) {
+
         vx = -px * 4;
         vy = -py * 4;
         var afterBallVx = 0;
         var afterBallVy = 0;
+        if (directionX < 0) {
+            ballVx = -ballVx;
+        }
+        if (directionY < 0) {
+            ballVy = -ballVy;
+        }
 
         if (vx === 0) {
-            afterBallVx = - ballVx * 80;
+            afterBallVx = -ballVx * 80;
         } else {
-            afterBallVx = -ballVx * 80 + vx * 2;
+            if (vx < 0  && ballVx < 0) {
+                afterBallVx = ballVx * 80 + vx * 2.5;
+            } else {
+                afterBallVx = -ballVx * 80 + vx * 2.5;
+            }
         }
 
         if (vy === 0) {
             afterBallVy = -ballVy * 80;
         } else {
-            afterBallVy = ballVy * 80 + vy * 2;
+            afterBallVy = ballVy * 80 + vy * 2.5;
         }
 
         return {
@@ -93,9 +119,13 @@
     var clientRect = canvas.getBoundingClientRect();
     var directionX = 1;
     var directionY = 1;
-    var kn = 0.7;
+    var kn = 1.2;
     var fps = 80;
     var gameManager = {
+        count: 0,
+        leftCount: 0,
+        rightCount: 0,
+        collisionFlag: false,
         manifest: [
             {
                 src: 'scoreboard-background.png',
@@ -134,16 +164,16 @@
             if (result) {
                 // 左边被进球, 右边得分
                 if (result === 1) {
-                    this.rightScore ++;
+                    this.rightScore++;
                     if (this.rightScore <= 99) {
                         setRightScore(this.rightScore);
                     } else {
                         this.rightScore = 0;
                         setRightScore(this.rightScore);
                     }
-                } else if ( result === 2) {
+                } else if (result === 2) {
                     // 右边被进球,左边得分
-                    this.leftScore ++;
+                    this.leftScore++;
                     if (this.leftScore <= 99) {
                         setLeftScore(this.leftScore);
                     } else {
@@ -179,53 +209,73 @@
             var leftIntersection = ndgmr.checkPixelCollision(this.ball, this.leftButton, 0);
             var rightIntersection = ndgmr.checkPixelCollision(this.ball, this.rightButton, 0);
 
-            if (leftIntersection) {
+            if (leftIntersection && this.collisionFlag !== 'left') {
                 var xDistance = this.leftButtonPosition[0].x - this.leftButtonPosition[this.leftButtonPosition.length - 1].x;
                 var yDistance = this.leftButtonPosition[0].y - this.leftButtonPosition[this.leftButtonPosition.length - 1].y;
                 var vBall = makeleftBallStatus(xDistance, yDistance, this.ball.vx, this.ball.vy);
-
+                this.collisionFlag = 'left';
+                console.log('left');
                 this.ball.vx = vBall.vx / 80;
                 this.ball.vy = vBall.vy / 80;
                 this.ball.isMoving = true;
+                this.count = 0;
+                directionY = directionX = 1;
+
+            } else if (leftIntersection) {
+                console.log('vx:' + this.ball.vx + 'vy:' + this.ball.vy);
+                console.log('collision:' + this.collisionFlag);
             }
 
-            if (rightIntersection) {
+            if (rightIntersection && this.collisionFlag !== 'right') {
+                console.log('right');
                 var xDistance1 = this.rightButtonPosition[0].x - this.rightButtonPosition[this.rightButtonPosition.length - 1].x;
                 var yDistance1 = this.rightButtonPosition[0].y - this.rightButtonPosition[this.rightButtonPosition.length - 1].y;
                 var vBall = makeRightBallStatus(xDistance1, yDistance1, this.ball.vx, this.ball.vy);
+                this.collisionFlag = 'right';
 
                 this.ball.vx = vBall.vx / 80;
                 this.ball.vy = vBall.vy / 80;
                 this.ball.isMoving = true;
+                this.count = 0;
+                directionY = directionX = 1;
+
+
+
+            } else if (rightIntersection) {
+                console.log('vx:' + this.ball.vx + 'vy:' + this.ball.vy);
+                console.log(this.collisionFlag);
+
             }
 
-            if (this.ball.vx > 0) {
-                if (this.ball.vx < kn/ fps) {
-                    this.ball.vx = 0;
-                } else {
-                    this.ball.vx -= kn / fps;
+            if (this.collisionFlag === 'left' || this.collisionFlag === 'right') {
+                this.count++;
+                if (this.count >= 15) {
+                    this.collisionFlag = false;
+                    this.count = 0;
                 }
-            } else if (this.ball.vx < 0) {
-                if (this.ball.vx > - kn / fps) {
-                    this.ball.vx = 0;
-                } else {
-                    this.ball.vx += kn / fps;
-                }
+
             }
 
-            if (this.ball.vy > 0) {
-                if (this.ball.vy < kn/ fps) {
-                    this.ball.vy = 0;
-                } else {
-                    this.ball.vy -= kn / fps;
-                }
-            } else if (this.ball.vy < 0) {
-                if (this.ball.vy > - kn / fps) {
-                    this.ball.vy = 0;
-                } else {
-                    this.ball.vy += kn / fps;
-                }
+
+            this.ball.vCom = Math.sqrt(this.ball.vx * this.ball.vx + this.ball.vy * this.ball.vy);
+            if (this.ball.vCom >= 90) {
+                this.ball.vCom = 90;
             }
+            this.ball.vCom -= kn / fps;
+            if (Math.abs(this.ball.vCom) <= kn / fps) {
+                this.ball.vCom = 0;
+                this.ball.isMoving = false;
+                this.ball.vx = 0;
+                this.ball.vy = 0;
+                this.stage.update();
+                return;
+
+            }
+            var vx = this.ball.vCom * this.ball.vx / Math.sqrt(this.ball.vx * this.ball.vx + this.ball.vy * this.ball.vy);
+            var vy = this.ball.vCom * this.ball.vy / Math.sqrt(this.ball.vx * this.ball.vx + this.ball.vy * this.ball.vy);
+
+            this.ball.vx = vx;
+            this.ball.vy = vy;
 
             // 球继续运动
             if (this.ball.isMoving) {
@@ -281,9 +331,6 @@
             this.ball.vy = 0;
             directionX = 1;
             directionY = 1;
-        },
-        createButton: function () {
-
         },
         removeEvent: function () {
             this.leftButton.removeAllEventListeners();
@@ -343,7 +390,7 @@
                     this.stage.update();
                 }.bind(this));
 
-                shape.on("pressup", function(evt) {
+                shape.on("pressup", function (evt) {
                     // this.lastLeftButtonStyle = shape.getTransformedBounds();
                 }.bind(this));
 
@@ -381,7 +428,7 @@
                     this.stage.update();
                 }.bind(this));
 
-                shape.on("pressup", function(evt) {
+                shape.on("pressup", function (evt) {
                     // shape.removeAllEventListeners();
                 }.bind(this));
 
@@ -401,10 +448,11 @@
             var bgResult = this.loader.getResult('court');
             var bg1 = new createjs.Bitmap(bgResult);
             bg1.x = bg1.y = 0;
-            var scaleX = canvas.width / bg1.getBounds().width;
-            var scaleY = canvas.height / (bg1.getBounds().height);;
-            bg1.scaleX = scaleX;
-            bg1.scaleY = scaleY;
+            var scaleX = (canvas.width / bg1.getBounds().width) / 4;
+            var scaleY = (canvas.height / (bg1.getBounds().height)) / 4;
+
+            bg1.scaleX = scaleX * 4;
+            bg1.scaleY = scaleY * 4;
             bgContainer.addChild(bg1);
 
             var buttonContainer = new createjs.Container();
@@ -442,7 +490,6 @@
         startMove: function (e) {
             var shape = e.target;
             this.stage.addEventListener('stagemousemove', function (t) {
-                console.log(t);
                 shape.x = t.stageX;
                 shape.y = t.stageY;
             });
@@ -456,7 +503,7 @@
         checkIsGetScore: function () {
             var height = clientRect.height;
             var width = clientRect.width;
-            var TopLimit = height * 0.3567;
+            var TopLimit = height * 0.32;
             var BottomLimit = height * 0.64 - this.ball.height / 2;
             var leftLimit = width * 0.048;
             var rightLimit = width * 0.92;
