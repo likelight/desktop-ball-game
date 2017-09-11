@@ -240,6 +240,7 @@
 
 
             this.ball.vCom = Math.sqrt(this.ball.vx * this.ball.vx + this.ball.vy * this.ball.vy);
+            // 设定最大最小值
             if (this.ball.vCom >= 90) {
                 this.ball.vCom = 90;
             }
