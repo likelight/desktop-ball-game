@@ -40,6 +40,7 @@
         document.getElementById('scoreright-single').setAttribute('src', url2);
     }
 
+    // 生成左侧撞击球速度
     function makeleftBallStatus(px, py, ballVx, ballVy) {
         vx = -px * 4;
         vy = -py * 4;
@@ -62,25 +63,17 @@
             afterBallVy = ballVy * 80 + vy * 2.5;
         }
 
-
         return {
             vx: afterBallVx, vy: afterBallVy
         };
-
     }
 
+    // 生成右侧撞击球速度
     function makeRightBallStatus(px, py, ballVx, ballVy) {
-
         vx = -px * 4;
         vy = -py * 4;
         var afterBallVx = 0;
         var afterBallVy = 0;
-        // if (directionX < 0) {
-        //     ballVx = -ballVx;
-        // }
-        // if (directionY < 0) {
-        //     ballVy = -ballVy;
-        // }
 
         if (vx === 0) {
             afterBallVx = -ballVx * 80;
@@ -218,15 +211,11 @@
                 var yDistance1 = this.rightButtonPosition[0].y - this.rightButtonPosition[this.rightButtonPosition.length - 1].y;
                 var vBall = makeRightBallStatus(xDistance1, yDistance1, this.ball.vx, this.ball.vy);
                 this.collisionFlag = 'right';
-
                 this.ball.vx = vBall.vx / 80;
                 this.ball.vy = vBall.vy / 80;
                 this.ball.isMoving = true;
                 this.count = 0;
                 directionY = directionX = 1;
-
-
-
             }
 
             if (this.collisionFlag === 'left' || this.collisionFlag === 'right') {
@@ -437,11 +426,11 @@
             var bgResult = this.loader.getResult('court');
             var bg1 = new createjs.Bitmap(bgResult);
             bg1.x = bg1.y = 0;
-            var scaleX = (canvas.width / bg1.getBounds().width) / 4;
-            var scaleY = (canvas.height / (bg1.getBounds().height)) / 4;
+            var scaleX = (canvas.width / bg1.getBounds().width)  / 1.5;
+            var scaleY = (canvas.height / (bg1.getBounds().height)) / 1.5;
 
-            bg1.scaleX = scaleX * 4;
-            bg1.scaleY = scaleY * 4;
+            bg1.scaleX = scaleX * 1.5;
+            bg1.scaleY = scaleY * 1.5;
             bgContainer.addChild(bg1);
 
             var buttonContainer = new createjs.Container();
