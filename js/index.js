@@ -103,8 +103,10 @@
     var clientRect = canvas.getBoundingClientRect();
     var directionX = 1;
     var directionY = 1;
-    var kn = 1.2;
-    var fps = 80;
+    const kn = 1.2;
+    const fps = 80;
+    const minV = 10;
+    const maxV = 90;
     var gameManager = {
         count: 0,
         leftCount: 0,
@@ -273,6 +275,12 @@
                 this.collisionFlag = 'left';
                 this.ball.vx = vBall.vx / 80;
                 this.ball.vy = vBall.vy / 80;
+                var vCom = Math.sqrt(this.ball.vx * this.ball.vx + this.ball.vy * this.ball.vy);
+                if (vCom < minV) {
+                    this.ball.vx = minV * this.ball.vx / vCom;
+                    this.ball.vy = minV * this.ball.vx / vCom;
+                }
+
                 this.ball.isMoving = true;
                 this.count = 0;
                 directionY = directionX = 1;
@@ -289,6 +297,12 @@
                 this.collisionFlag = 'right';
                 this.ball.vx = vBall.vx / 80;
                 this.ball.vy = vBall.vy / 80;
+
+                var vCom = Math.sqrt(this.ball.vx * this.ball.vx + this.ball.vy * this.ball.vy);
+                if (vCom < minV) {
+                    this.ball.vx = minV * this.ball.vx / vCom;
+                    this.ball.vy = minV * this.ball.vx / vCom;
+                }
                 this.ball.isMoving = true;
                 this.count = 0;
                 directionY = directionX = 1;
@@ -304,8 +318,8 @@
 
             this.ball.vCom = Math.sqrt(this.ball.vx * this.ball.vx + this.ball.vy * this.ball.vy);
             // 设定最大最小值
-            if (this.ball.vCom >= 90) {
-                this.ball.vCom = 90;
+            if (this.ball.vCom >= maxV) {
+                this.ball.vCom = maxV;
             }
             this.ball.vCom -= kn / fps;
             if (Math.abs(this.ball.vCom) <= kn / fps) {
