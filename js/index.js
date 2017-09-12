@@ -50,7 +50,7 @@
         if (vx === 0) {
             afterBallVx = -ballVx * 80;
         } else {
-            if (vx > 0  && ballVx > 0) {
+            if (vx > 0 && ballVx > 0) {
                 afterBallVx = ballVx * 80 + vx * 2.5;
             } else {
                 afterBallVx = -ballVx * 80 + vx * 2.5;
@@ -78,7 +78,7 @@
         if (vx === 0) {
             afterBallVx = -ballVx * 80;
         } else {
-            if (vx < 0  && ballVx < 0) {
+            if (vx < 0 && ballVx < 0) {
                 afterBallVx = ballVx * 80 + vx * 2.5;
             } else {
                 afterBallVx = -ballVx * 80 + vx * 2.5;
@@ -127,10 +127,26 @@
             }, {
                 src: 'dice.png',
                 id: 'ball'
+            }, {
+                src: 'background.mp3',
+                id: 'bg_music'
+            }, {
+                src: 'ball.mp3',
+                id: 'ball_sound'
+            }, {
+                src: 'win.mp3',
+                id: 'win_sound'
+            }, {
+                src: 'win.png',
+                id: 'win'
+            }, {
+                src: 'replay.png',
+                id: 'replay'
             }
         ],
         init: function () {
             this.loader = new createjs.LoadQueue();
+            this.loader.installPlugin(createjs.Sound);
             this.loader.addEventListener('complete', this.handleLoadComplete.bind(this));
             this.loader.loadManifest(this.manifest, true, './images/');
             this.leftButtonPosition = [];
@@ -142,7 +158,52 @@
             setLeftScore(this.leftScore);
             setRightScore(this.rightScore);
         },
+        setWin: function (flag) {
+            this.win_sound = createjs.Sound.play('win_sound', {
+                loop: -1
+            });
+            var replayPic = this.loader.getResult('replay');
+            var winPic = this.loader.getResult('win');
+            this.replayImg = new createjs.Bitmap(replayPic);
+            this.winImg = new createjs.Bitmap(winPic);
+            this.replayImg.scaleX = this.leftButton.scaleX;
+            this.replayImg.scaleY = this.leftButton.scaleY;
+            this.winImg.scaleX = this.leftButton.scaleX / 1.5;
+            this.winImg.scaleY = this.leftButton.scaleY / 1.5;
+            this.replayImg.y = 0.5 * clientRect.height - this.replayImg.getTransformedBounds().height * 0.5;
+            this.replayImg.x = 0.5 * clientRect.width - this.replayImg.getTransformedBounds().width * 0.5;
+            if (flag === 'left') {
+                this.winImg.y = 0.5 * clientRect.height - this.winImg.getTransformedBounds().height * 0.5;
+                this.winImg.rotation = 0;
+                this.winImg.x = 0.3 * clientRect.width - this.winImg.getTransformedBounds().width * 0.5;
+            }
+            else if (flag === 'right')
+            {
+                this.winImg.y = 0.5 * clientRect.height + this.winImg.getTransformedBounds().height * 0.5;
+                this.winImg.rotation = 180;
+                this.winImg.x = 0.7 * clientRect.width + this.winImg.getTransformedBounds().width * 0.5;
+            }
+
+
+
+            this.replayImg.addEventListener('click', function () {
+                this.stage.removeChild(this.replayImg);
+                this.stage.removeChild(this.winImg);
+                this.win_sound.stop();
+                this.rePlay();
+            }.bind(this));
+            this.stage.addChild(this.replayImg);
+            this.stage.addChild(this.winImg);
+            this.stage.update();
+
+            createjs.Ticker.paused = true;
+            this.removeEvent();
+
+        },
         tick: function (e) {
+            if (e.paused) {
+                return;
+            }
             // 判断是否进球
             var result = this.checkIsGetScore();
             if (result) {
@@ -151,6 +212,11 @@
                     this.rightScore++;
                     if (this.rightScore <= 99) {
                         setRightScore(this.rightScore);
+                        if (this.rightScore === 5) {
+                            this.setWin('right');
+                            return;
+                        }
+
                     } else {
                         this.rightScore = 0;
                         setRightScore(this.rightScore);
@@ -160,6 +226,10 @@
                     this.leftScore++;
                     if (this.leftScore <= 99) {
                         setLeftScore(this.leftScore);
+                        if (this.leftScore === 5) {
+                            this.setWin('left');
+                            return;
+                        }
                     } else {
                         this.leftScore = 0;
                         setLeftScore(this.leftScore);
@@ -197,6 +267,9 @@
                 var xDistance = this.leftButtonPosition[0].x - this.leftButtonPosition[this.leftButtonPosition.length - 1].x;
                 var yDistance = this.leftButtonPosition[0].y - this.leftButtonPosition[this.leftButtonPosition.length - 1].y;
                 var vBall = makeleftBallStatus(xDistance, yDistance, this.ball.vx, this.ball.vy);
+                this.ball_music = createjs.Sound.play('ball_sound', {
+                    loop: 0
+                });
                 this.collisionFlag = 'left';
                 this.ball.vx = vBall.vx / 80;
                 this.ball.vy = vBall.vy / 80;
@@ -210,6 +283,9 @@
                 var xDistance1 = this.rightButtonPosition[0].x - this.rightButtonPosition[this.rightButtonPosition.length - 1].x;
                 var yDistance1 = this.rightButtonPosition[0].y - this.rightButtonPosition[this.rightButtonPosition.length - 1].y;
                 var vBall = makeRightBallStatus(xDistance1, yDistance1, this.ball.vx, this.ball.vy);
+                this.ball_music = createjs.Sound.play('ball_sound', {
+                    loop: 0
+                });
                 this.collisionFlag = 'right';
                 this.ball.vx = vBall.vx / 80;
                 this.ball.vy = vBall.vy / 80;
@@ -224,9 +300,7 @@
                     this.collisionFlag = false;
                     this.count = 0;
                 }
-
             }
-
 
             this.ball.vCom = Math.sqrt(this.ball.vx * this.ball.vx + this.ball.vy * this.ball.vy);
             // 设定最大最小值
@@ -278,7 +352,7 @@
                         directionY = -directionY * 0.8;
                     }
                     else {
-                       // directionY = -directionY;
+                        // directionY = -directionY;
                         this.ball.vy = -this.ball.vy;
                     }
                 }
@@ -297,6 +371,13 @@
             }
 
         },
+        rePlay: function () {
+            createjs.Ticker.setPaused(false);
+            this.initStart();
+            this.initScore();
+            this.initEvent();
+        },
+
         initStart: function () {
             this.leftButton.x = 0.1 * clientRect.width;
             this.leftButton.y = 0.5 * clientRect.height - this.leftButton.getTransformedBounds().height * 0.5;
@@ -307,6 +388,8 @@
             this.ball.isMoving = false;
             this.ball.vx = 0;
             this.ball.vy = 0;
+            this.leftButtonPosition.length = 0;
+            this.rightButtonPosition.length = 0;
             directionX = 1;
             directionY = 1;
         },
@@ -337,7 +420,6 @@
         initEvent: function () {
             this.leftButton.addEventListener("mousedown", function (e) {
                 this.lastLeftButtonStyle = this.leftButton.getTransformedBounds();
-
                 var initLeftButtonStyle = this.leftButton.getTransformedBounds();
                 var initEvtStyle = {
                     x: e.stageX,
@@ -418,6 +500,9 @@
             createjs.Ticker.setFPS(fps);
             createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
             createjs.Ticker.addEventListener("tick", this.tick.bind(this));
+            this.bg_music = createjs.Sound.play('bg_music', {
+                loop: -1
+            });
         },
         handleLoadComplete: function () {
             this.initStage();
@@ -426,7 +511,7 @@
             var bgResult = this.loader.getResult('court');
             var bg1 = new createjs.Bitmap(bgResult);
             bg1.x = bg1.y = 0;
-            var scaleX = (canvas.width / bg1.getBounds().width)  / 1.5;
+            var scaleX = (canvas.width / bg1.getBounds().width) / 1.5;
             var scaleY = (canvas.height / (bg1.getBounds().height)) / 1.5;
 
             bg1.scaleX = scaleX * 1.5;
@@ -477,6 +562,7 @@
         },
 
         stopGame: function () {
+
         },
         checkIsGetScore: function () {
             var height = clientRect.height;
