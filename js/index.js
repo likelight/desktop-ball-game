@@ -112,6 +112,8 @@
         leftCount: 0,
         rightCount: 0,
         collisionFlag: false,
+        offsetX: 0,
+        offsetY: 0,
         manifest: [
             {
                 src: 'scoreboard-background.png',
@@ -144,6 +146,9 @@
             }, {
                 src: 'replay.png',
                 id: 'replay'
+            }, {
+                src: 'shadow.png',
+                id: 'shadow'
             }
         ],
         init: function () {
@@ -194,8 +199,6 @@
                 this.winImg.rotation = 180;
                 this.winImg.x = 0.7 * clientRect.width + this.winImg.getTransformedBounds().width * 0.5;
             }
-
-
 
             this.replayImg.addEventListener('click', function () {
                 this.stage.removeChild(this.replayImg);
@@ -414,6 +417,13 @@
             this.leftButton.y = 0.5 * clientRect.height - this.leftButton.getTransformedBounds().height * 0.5;
             this.rightButton.x = 0.8 * clientRect.width;
             this.rightButton.y = 0.5 * clientRect.height - this.rightButton.getTransformedBounds().height * 0.5;
+            this.offsetX = this.leftButton.getTransformedBounds().width * 0.1;
+            this.offsetY = this.rightButton.getTransformedBounds().height * 0.25;
+            this.leftShadow.x = 0.1 * clientRect.width + this.offsetX;
+            this.leftShadow.y = 0.5 * clientRect.height - this.offsetY;
+            this.rightShadow.x = 0.8 * clientRect.width + this.offsetX;
+            this.rightShadow.y = 0.5 * clientRect.height - this.offsetY;
+
             this.ball.x = 0.5 * clientRect.width - 0.5 * this.ball.width;
             this.ball.y = 0.5 * clientRect.height - 0.5 * this.ball.height;
             this.ball.isMoving = false;
@@ -478,6 +488,8 @@
                         shape.y = bottomLimit;
                     }
 
+                    this.leftShadow.x = shape.x + 10;
+                    this.leftShadow.y = shape.y + this.offsetY;
                     this.stage.update();
                 }.bind(this));
 
@@ -515,6 +527,8 @@
                     if (shape.y > bottomLimit) {
                         shape.y = bottomLimit;
                     }
+                    this.rightShadow.x = shape.x + 10;
+                    this.rightShadow.y = shape.y + this.offsetY;
 
                     this.stage.update();
                 }.bind(this));
@@ -549,10 +563,13 @@
 
             var buttonContainer = new createjs.Container();
             var buttonImg = this.loader.getResult('button');
+            var shadowImg = this.loader.getResult('shadow');
             this.leftButton = new createjs.Bitmap(buttonImg);
             this.rightButton = new createjs.Bitmap(buttonImg);
-            this.rightButton.scaleX = this.leftButton.scaleX = scaleX;
-            this.rightButton.scaleY = this.leftButton.scaleY = scaleY;
+            this.leftShadow = new createjs.Bitmap(shadowImg);
+            this.rightShadow = new createjs.Bitmap(shadowImg);
+            this.rightShadow.scaleX = this.leftShadow.scaleX = this.rightButton.scaleX = this.leftButton.scaleX = scaleX;
+            this.rightShadow.scaleY = this.leftShadow.scaleY = this.rightButton.scaleY = this.leftButton.scaleY = scaleY;
 
             // 添加球
             var ballImg = this.loader.getResult('ball');
@@ -565,22 +582,36 @@
             this.initScore();
             this.initStart();
 
-            this.lastLeftButtonStyle = this.leftButton.getTransformedBounds();
-            this.lastRightButtonStyle = this.rightButton.getTransformedBounds();
+
 
             this.initEvent();
 
             buttonContainer.addChild(this.ball);
+            buttonContainer.addChild(this.leftShadow);
+            buttonContainer.addChild(this.rightShadow);
             buttonContainer.addChild(this.rightButton);
             buttonContainer.addChild(this.leftButton);
 
-            // this.bg_music = createjs.Sound.play('bg_music', {
-            //     loop: -1,
-            //     volume: 0.5
-            // });
 
             this.stage.addChild(bgContainer);
             this.stage.addChild(buttonContainer);
+
+            this.stage.addEventListener('click', function (e) {
+                var audio = document.getElementById('audio');
+                if(audio!== null){
+                    if(!audio.paused)
+                    {
+// 这个就是暂停
+                        audio.pause();
+                    } else {
+
+                        audio.load();
+                        audio.loop = true;
+                        audio.play();
+                    }
+                }
+                this.stage.removeAllEventListeners();
+            }.bind(this));
             this.stage.update();
         },
 
