@@ -149,10 +149,12 @@
         init: function () {
             this.loader = new createjs.LoadQueue();
             this.loader.installPlugin(createjs.Sound);
+            createjs.Sound.alternateExtensions = ["mp3"];
             this.loader.addEventListener('complete', this.handleLoadComplete.bind(this));
             this.loader.loadManifest(this.manifest, true, './images/');
             this.leftButtonPosition = [];
             this.rightButtonPosition = [];
+            document.getElementById('audio').play();
         },
         initScore: function () {
             this.leftScore = 0;
@@ -162,7 +164,7 @@
         },
         setWin: function (flag) {
             this.win_sound = createjs.Sound.play('win_sound', {
-                loop: -1
+                loop: 0
             });
             var replayPic = this.loader.getResult('replay');
             var winPic = this.loader.getResult('win');
@@ -172,8 +174,15 @@
             this.replayImg.scaleY = this.leftButton.scaleY;
             this.winImg.scaleX = this.leftButton.scaleX / 1.5;
             this.winImg.scaleY = this.leftButton.scaleY / 1.5;
-            this.replayImg.y = 0.5 * clientRect.height - this.replayImg.getTransformedBounds().height * 0.5;
+            this.replayImg.y = 0.5 * clientRect.height - this.replayImg.getTransformedBounds().height;
             this.replayImg.x = 0.5 * clientRect.width - this.replayImg.getTransformedBounds().width * 0.5;
+
+
+            this.drawingCanvas = new createjs.Shape();
+            this.drawingCanvas.graphics.beginFill("#ffffff").drawRect(0, 0, clientRect.width, clientRect.height);
+            this.drawingCanvas.alpha = 0.3;
+
+
             if (flag === 'left') {
                 this.winImg.y = 0.5 * clientRect.height - this.winImg.getTransformedBounds().height * 0.5;
                 this.winImg.rotation = 0;
@@ -191,11 +200,18 @@
             this.replayImg.addEventListener('click', function () {
                 this.stage.removeChild(this.replayImg);
                 this.stage.removeChild(this.winImg);
+                this.stage.removeChild(this.drawingCanvas);
                 this.win_sound.stop();
                 this.rePlay();
             }.bind(this));
-            this.stage.addChild(this.replayImg);
+
             this.stage.addChild(this.winImg);
+            // this.stage.addChild(this.replayImg);
+            setTimeout(function () {
+                this.stage.addChild(this.drawingCanvas);
+                this.stage.addChild(this.replayImg);
+                this.stage.update();
+            }.bind(this), 2500);
             this.stage.update();
 
             createjs.Ticker.paused = true;
@@ -387,6 +403,7 @@
         },
         rePlay: function () {
             createjs.Ticker.setPaused(false);
+
             this.initStart();
             this.initScore();
             this.initEvent();
@@ -514,16 +531,14 @@
             createjs.Ticker.setFPS(fps);
             createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
             createjs.Ticker.addEventListener("tick", this.tick.bind(this));
-            this.bg_music = createjs.Sound.play('bg_music', {
-                loop: -1
-            });
+
         },
         handleLoadComplete: function () {
             this.initStage();
-
             var bgContainer = new createjs.Container();
             var bgResult = this.loader.getResult('court');
             var bg1 = new createjs.Bitmap(bgResult);
+
             bg1.x = bg1.y = 0;
             var scaleX = (canvas.width / bg1.getBounds().width) / 1.5;
             var scaleY = (canvas.height / (bg1.getBounds().height)) / 1.5;
@@ -559,6 +574,11 @@
             buttonContainer.addChild(this.rightButton);
             buttonContainer.addChild(this.leftButton);
 
+            // this.bg_music = createjs.Sound.play('bg_music', {
+            //     loop: -1,
+            //     volume: 0.5
+            // });
+
             this.stage.addChild(bgContainer);
             this.stage.addChild(buttonContainer);
             this.stage.update();
@@ -570,13 +590,6 @@
                 shape.x = t.stageX;
                 shape.y = t.stageY;
             });
-        },
-
-        startGame: function () {
-        },
-
-        stopGame: function () {
-
         },
         checkIsGetScore: function () {
             var height = clientRect.height;
