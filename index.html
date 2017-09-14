@@ -1,1 +1,45 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>桌上足球游戏</title><meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"><link rel="stylesheet" href="css/app.css"></head><body><div class="board"><audio id="audio" autoplay="autoplay" loop="loop"  preload="auto"  src="./images/background.mp3">你的浏览器不支持audio标签</audio><div class="board-score"><div class="item score11"><img class="score-img" id="scoreleft-ten" src="./images/0.png" alt=""></div><div class="item score12"><img class="score-img" id="scoreleft-single" src="./images/0.png" alt=""></div><div class="score-seprator"></div><div class="item score21"><img class="score-img" id="scoreright-ten" src="./images/0.png" alt=""></div><div class="item score22"><img class="score-img" id="scoreright-single" src="./images/0.png" alt=""></div></div><div class="board-court"><canvas id="match"></canvas></div></div><script src="js/lib/create.js"></script><script src="js/lib/ndgmr.Collision.js"></script><script src="js/index.min.js?time=20170408"></script><script>        gameManager.init();</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>桌上足球游戏</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+    <div class="board">
+        <div id="audio-control" style="position: absolute" class="play-button"></div>
+        <audio id="audio" autoplay="autoplay" loop="loop"  preload="auto"
+               src="./images/background.mp3">
+            你的浏览器不支持audio标签
+        </audio>
+        <div class="board-score">
+            <div class="item score11">
+                <img class="score-img" id="scoreleft-ten" src="./images/0.png" alt="">
+            </div>
+            <div class="item score12">
+                <img class="score-img" id="scoreleft-single" src="./images/0.png" alt="">
+            </div>
+            <div class="score-seprator"></div>
+            <div class="item score21">
+                <img class="score-img" id="scoreright-ten" src="./images/0.png" alt="">
+            </div>
+            <div class="item score22">
+                <img class="score-img" id="scoreright-single" src="./images/0.png" alt="">
+            </div>
+        </div>
+        <div class="board-court">
+            <canvas id="match">
+
+            </canvas>
+        </div>
+    </div>
+    <script src="js/lib/create.js"></script>
+    <script src="js/lib/ndgmr.Collision.js"></script>
+    <script src="js/index.min.js?time=20170408"></script>
+    <script>
+
+        gameManager.init();
+    </script>
+</body>
+</html>

@@ -15,6 +15,36 @@
         }
     }
 
+    function bf(obj) {
+        var audio = document.getElementById('audio');
+        if (audio !== null) {
+            audio.load();
+            audio.loop = true;
+            audio.play();
+        }
+    }
+
+    function bf_stop(obj) {
+        var audio = document.getElementById('audio');
+        if (audio !== null) {
+            // 这个就是暂停
+            audio.pause();
+
+        }
+    }
+
+    document.getElementById('audio-control').addEventListener('click', function (e) {
+        if (e.target.className.indexOf('play-stop') > -1) {
+            bf_stop();
+            e.target.className = 'play-button';
+
+        } else {
+            bf();
+            e.target.className += ' play-stop';
+        }
+
+    });
+
     function setLeftScore(score) {
         var tenScore = 0;
         var singleScore = 0;
@@ -142,7 +172,6 @@
             this.loader.loadManifest(this.manifest, true, './images/');
             this.leftButtonPosition = [];
             this.rightButtonPosition = [];
-            document.getElementById('audio').play();
         },
         initScore: function () {
             this.leftScore = 0;
@@ -176,8 +205,7 @@
                 this.winImg.rotation = 0;
                 this.winImg.x = 0.3 * clientRect.width - this.winImg.getTransformedBounds().width * 0.5;
             }
-            else if (flag === 'right')
-            {
+            else if (flag === 'right') {
                 this.winImg.y = 0.5 * clientRect.height + this.winImg.getTransformedBounds().height * 0.5;
                 this.winImg.rotation = 180;
                 this.winImg.x = 0.7 * clientRect.width + this.winImg.getTransformedBounds().width * 0.5;
@@ -554,22 +582,22 @@
             this.stage.addChild(bgContainer);
             this.stage.addChild(buttonContainer);
 
-            this.stage.addEventListener('click', function (e) {
-                var audio = document.getElementById('audio');
-                if(audio!== null){
-                    if(!audio.paused)
-                    {
-                    // 这个就是暂停
-                        audio.pause();
-                    } else {
-
-                        audio.load();
-                        audio.loop = true;
-                        audio.play();
-                    }
-                }
-                this.stage.removeAllEventListeners();
-            }.bind(this));
+            // this.stage.addEventListener('click', function (e) {
+            //     var audio = document.getElementById('audio');
+            //     if(audio!== null){
+            //         if(!audio.paused)
+            //         {
+            //         // 这个就是暂停
+            //             audio.pause();
+            //         } else {
+            //
+            //             audio.load();
+            //             audio.loop = true;
+            //             audio.play();
+            //         }
+            //     }
+            //     this.stage.removeAllEventListeners();
+            // }.bind(this));
             this.stage.update();
         },
         checkIsGetScore: function () {
