@@ -15,16 +15,12 @@
         }
     }
 
-
     function setLeftScore(score) {
         var tenScore = 0;
         var singleScore = 0;
         singleScore = score % 10;
         tenScore = parseInt(score / 10);
-        var url1 = './images/' + tenScore + '.png';
         var url2 = './images/' + singleScore + '.png';
-
-        document.getElementById('scoreleft-ten').setAttribute('src', url1);
         document.getElementById('scoreleft-single').setAttribute('src', url2);
     }
 
@@ -33,10 +29,7 @@
         var singleScore = 0;
         singleScore = score % 10;
         tenScore = parseInt(score / 10);
-        var url1 = './images/' + tenScore + '.png';
         var url2 = './images/' + singleScore + '.png';
-
-        document.getElementById('scoreright-ten').setAttribute('src', url1);
         document.getElementById('scoreright-single').setAttribute('src', url2);
     }
 
@@ -116,13 +109,6 @@
         offsetY: 0,
         manifest: [
             {
-                src: 'scoreboard-background.png',
-                id: 'bg'
-            },
-            {
-                src: 'board.jpg',
-                id: 'board'
-            }, {
                 src: 'button.png',
                 id: 'button'
             }, {
@@ -132,15 +118,6 @@
                 src: 'dice.png',
                 id: 'ball'
             }, {
-                src: 'background.mp3',
-                id: 'bg_music'
-            }, {
-                src: 'ball.mp3',
-                id: 'ball_sound'
-            }, {
-                src: 'win.mp3',
-                id: 'win_sound'
-            }, {
                 src: 'win.png',
                 id: 'win'
             }, {
@@ -149,7 +126,13 @@
             }, {
                 src: 'shadow.png',
                 id: 'shadow'
-            }
+            }, {
+                src: 'ball.mp3',
+                id: 'ball_sound'
+            }, {
+                src: 'win.mp3',
+                id: 'win_sound'
+            },
         ],
         init: function () {
             this.loader = new createjs.LoadQueue();
@@ -406,12 +389,10 @@
         },
         rePlay: function () {
             createjs.Ticker.setPaused(false);
-
             this.initStart();
             this.initScore();
             this.initEvent();
         },
-
         initStart: function () {
             this.leftButton.x = 0.1 * clientRect.width;
             this.leftButton.y = 0.5 * clientRect.height - this.leftButton.getTransformedBounds().height * 0.5;
@@ -437,26 +418,6 @@
         removeEvent: function () {
             this.leftButton.removeAllEventListeners();
             this.rightButton.removeAllEventListeners();
-        },
-        initButton: function (canvas, bg1) {
-            this.buttonContainer = new createjs.Container();
-
-            var buttonImg = this.loader.getResult('button');
-            this.leftButton = new createjs.Bitmap(buttonImg);
-            this.rightButton = new createjs.Bitmap(buttonImg);
-
-            this.rightButton.scaleX = this.leftButton.scaleX = canvas.width / bg1.getBounds().width;
-            this.rightButton.scaleY = this.leftButton.scaleY = canvas.height / bg1.getBounds().height;
-
-            var ballImg = this.loader.getResult('ball');
-            this.ball = new createjs.Bitmap(ballImg);
-            this.ball.scaleX = canvas.width / bg1.getBounds().width;
-            this.ball.scaleY = canvas.height / bg1.getBounds().height;
-            this.ball.width = this.ball.getTransformedBounds().width;
-            this.ball.height = this.ball.getTransformedBounds().height;
-            this.lastLeftButtonStyle = this.leftButton.getTransformedBounds();
-            this.lastRightButtonStyle = this.rightButton.getTransformedBounds();
-
         },
         initEvent: function () {
             this.leftButton.addEventListener("mousedown", function (e) {
@@ -581,9 +542,6 @@
             this.ball.height = this.ball.getTransformedBounds().height;
             this.initScore();
             this.initStart();
-
-
-
             this.initEvent();
 
             buttonContainer.addChild(this.ball);
@@ -601,7 +559,7 @@
                 if(audio!== null){
                     if(!audio.paused)
                     {
-// 这个就是暂停
+                    // 这个就是暂停
                         audio.pause();
                     } else {
 
@@ -613,14 +571,6 @@
                 this.stage.removeAllEventListeners();
             }.bind(this));
             this.stage.update();
-        },
-
-        startMove: function (e) {
-            var shape = e.target;
-            this.stage.addEventListener('stagemousemove', function (t) {
-                shape.x = t.stageX;
-                shape.y = t.stageY;
-            });
         },
         checkIsGetScore: function () {
             var height = clientRect.height;
